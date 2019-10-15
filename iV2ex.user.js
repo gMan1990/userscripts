@@ -2,8 +2,8 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1
-// @description  reply_content markdown, like clone sort, image preview
+// @version      0.1.1
+// @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
 // @match        https://v2ex.com/t/*
@@ -85,9 +85,9 @@ jQuery.noConflict(true)($ => {
                             return "\\" + m;
                         });
 
-                        /* https://v2ex.com/t/608758?p=1#r_8018645 */
-                        content = content.replace(new RegExp("^(?!```)(.+\\r?\\n)(-{2,}(\\r?\\n|$))"), function(m, g1, g2) {
-                            return g1 + "\\" + g2;
+                        /* https://v2ex.com/t/287990?p=1#r_3305842 */
+                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)+?)(-{2,}(\\r?\\n|$))"), function(m, g1, g2, g3) {
+                            return g1 + "\\" + g3;
                         });
 
                         /* replace before markdown */
