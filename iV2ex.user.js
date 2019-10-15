@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.1
+// @version      0.1.2
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -27,13 +27,13 @@
 jQuery.noConflict(true)($ => {
     if ("github.com" == location.hostname) {
         var $bsp = $("#branch-autoload-container>div>ul");
-        for (var _c = true, $pn = $("div.pagination>a"); _c && "Next" == $pn.text();) {
+        for (var _c = true, $pn = $("div.pagination>a:last-of-type"); _c && "Next" == $pn.text();) {
             $.ajax({
                 async : false,
                 url : $pn.attr("href"),
                 success : function(d) {
                     $bsp.append($("li[data-branch-name]", d));
-                    $pn = $("div.pagination>a", d);
+                    $pn = $("div.pagination>a:last-of-type", d);
                 },
                 error : function() {
                     _c = false;
@@ -80,9 +80,9 @@ jQuery.noConflict(true)($ => {
                             return g1 + g2 + "```";
                         });
 
-                        /* https://v2ex.com/t/597385?p=1#r_7848594 */
-                        content = content.replace(/^#[^#]/, function(m) {
-                            return "\\" + m;
+                        /* https://v2ex.com/t/609213?p=1#r_8025750 */
+                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)*?)(#[^#])"), function(m, g1, g2, g3) {
+                            return g1 + "\\" + g3;
                         });
 
                         /* https://v2ex.com/t/287990?p=1#r_3305842 */
