@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.2
+// @version      0.1.3
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -57,7 +57,10 @@ jQuery.noConflict(true)($ => {
             success : function(d) {
                 var mconv = new showdown.Converter({
                         simpleLineBreaks : true,
-                        simplifiedAutoLink : true
+                        simplifiedAutoLink : true,
+                        literalMidWordUnderscores : true,
+                        omitExtraWLInCodeBlocks : true,
+                        tables : true
                     }),
                     lastIndex = -1,
                     searchContent = e => {
@@ -86,7 +89,7 @@ jQuery.noConflict(true)($ => {
                         });
 
                         /* https://v2ex.com/t/287990?p=1#r_3305842 */
-                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)+?)(-{2,}(\\r?\\n|$))"), function(m, g1, g2, g3) {
+                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)+?)((-{2,}|={2,})(\\r?\\n|$))"), function(m, g1, g2, g3) {
                             return g1 + "\\" + g3;
                         });
 
