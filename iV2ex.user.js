@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.2
+// @version      0.1.1
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -11,7 +11,7 @@
 // @grant        none
 // @require      https://code.jquery.com/jquery-2.x-git.min.js
 // @require      https://unpkg.com/mapsort/compiled/iife/mapsort.min.js
-// @require      https://rawgit.com/showdownjs/showdown/develop/dist/showdown.min.js
+// @require      https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js
 // ==/UserScript==
 
 
