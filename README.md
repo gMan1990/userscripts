@@ -6,7 +6,7 @@ User scripts put you in control of your browsing experience.
 - [install](https://raw.githubusercontent.com/gMan1990/userscripts/master/iV2ex.user.js)
 - features
     - [x] reply_content markdown
-    - [ ] like clone sort
+    - [x] like clone sort
     - [ ] image viewer
 - demos
     - [https://v2ex.com/t/608215?p=1#r_8011678](https://v2ex.com/t/608215?p=1#r_8011678)
@@ -23,3 +23,5 @@ User scripts put you in control of your browsing experience.
                 <td><img src="https://raw.githubusercontent.com/gMan1990/userscripts/master/iV2ex/t608455-p2-r_8016948-1.png"></td>
             </tr>
         </table>
+    - sort by ♥ desc (1+)
+        ![alt](https://raw.githubusercontent.com/gMan1990/userscripts/master/iV2ex/WX20191016-230045@2x.png)

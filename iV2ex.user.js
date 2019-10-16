@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.3
+// @version      0.1.4
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -25,6 +25,8 @@
 
 
 jQuery.noConflict(true)($ => {
+    var sortDesc = (a, b) => a == b ? 0 : (a > b ? -1 : 1);
+
     if ("github.com" == location.hostname) {
         var $bsp = $("#branch-autoload-container>div>ul");
         for (var _c = true, $pn = $("div.pagination>a:last-of-type"); _c && "Next" == $pn.text();) {
@@ -45,7 +47,7 @@ jQuery.noConflict(true)($ => {
         if (1 < $bs.length) {
             $bsp.html(mapSort($bs, function(e) {
                 return $("time-ago", e).attr("datetime");
-            }, (a, b) => a == b ? 0 : (a > b ? -1 : 1)));
+            }, sortDesc));
         }
     } else if (/\bv2ex\.com$/.test(location.hostname)) {
         $.ajax({ /* https://v2ex.com/t/608215?p=1#r_8011719 */
@@ -75,9 +77,10 @@ jQuery.noConflict(true)($ => {
                     };
                 /* for development */ window._iV2ex = {$ : $, M : mconv };
 
-                $("#Main div.cell[id]").each((i, e) => {
+                var $replies = $("#Main div.cell[id]").each((i, e) => {
                     var content = searchContent(e);
                     if (content) {
+                        /* https://v2ex.com/t/609635?p=1#r_8032938 可以添加编辑后重新 Md */
                         /* https://v2ex.com/t/608215?p=1#r_8011678 not safe */
                         content = content.replace(new RegExp("(^|\\n)(```.*?\\n)`{1,2}(?=\\r?\\n|$)", "gs"), function(m, g1, g2) {
                             return g1 + g2 + "```";
@@ -97,6 +100,7 @@ jQuery.noConflict(true)($ => {
                         var $cont = $(mconv.makeHtml(content));
                         /* replace after  markdown */
 
+                        /* https://v2ex.com/t/609990?p=1#r_8037987 显示Gist 代码暂不处理 */
                         /* https://v2ex.com/t/608634?p=1#r_8016535 */
                         $cont.find("a").each((ii, aa) => {
                             if (/\.(gif|png|jpg)$/.test(aa.pathname)) {
@@ -132,6 +136,18 @@ jQuery.noConflict(true)($ => {
                         });
                     }
                 });
+
+                $("#Rightbar>div.box").first().append(mapSort($replies.find("div.reply_content").parent().filter((i, e) => {
+                    return $(">span.small.fade", e).text().substr(2) > 1;
+                }).clone().each((i, e) => {
+                    e.style.display = "block";
+                    e.style.borderTop = "1px dotted";
+                    e.style.margin = "2px 2px 0";
+                    e.style.fontSize = "13px";
+                }), function(e) {
+                    return Number($(">span.small.fade", e).text().substr(2));
+                }, sortDesc));
+                $("<style>#Rightbar .reply_content { font-size: 12px; } #Rightbar td>div.fr { display: none; }</style>").appendTo(document.head);
             }
         });
     }
