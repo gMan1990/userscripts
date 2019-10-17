@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.4
+// @version      0.1.5
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -12,6 +12,7 @@
 // @require      https://code.jquery.com/jquery-2.x-git.min.js
 // @require      https://unpkg.com/mapsort/compiled/iife/mapsort.min.js
 // @require      https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js
+// @require      https://raw.githubusercontent.com/leizongmin/js-xss/master/dist/xss.min.js
 // ==/UserScript==
 
 
@@ -91,8 +92,8 @@ jQuery.noConflict(true)($ => {
                             return g1 + "\\" + g3;
                         });
 
-                        /* https://v2ex.com/t/287990?p=1#r_3305842 */
-                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)+?)((-{2,}|={2,})(\\r?\\n|$))"), function(m, g1, g2, g3) {
+                        /* https://v2ex.com/t/610456?p=1#r_8044975 */
+                        content = content.replace(new RegExp("^(((?!```).*\\r?\\n)+?)((-{2,}|={2,}) *(\\r?\\n|$))"), function(m, g1, g2, g3) {
                             return g1 + "\\" + g3;
                         });
 
@@ -100,11 +101,19 @@ jQuery.noConflict(true)($ => {
                         var $cont = $(mconv.makeHtml(content));
                         /* replace after  markdown */
 
+                        /* https://v2ex.com/t/610120?p=1#r_8044233 */
+                        if ($cont.filter("script").length) {
+                            return true;
+                        }
+
+                        /* https://v2ex.com/t/610258?p=1#r_8042218 */
+                        $cont.find("img[alt='']").attr("alt", "alt");
+
                         /* https://v2ex.com/t/609990?p=1#r_8037987 显示Gist 代码暂不处理 */
                         /* https://v2ex.com/t/608634?p=1#r_8016535 */
-                        $cont.find("a").each((ii, aa) => {
+                        $cont.children("a").each((ii, aa) => {
                             if (/\.(gif|png|jpg)$/.test(aa.pathname)) {
-                                aa.outerHTML = '<img src="' + aa.href + '">';
+                                aa.outerHTML = '<img alt="alt" src="' + aa.href + '">';
                             }
                         });
 
@@ -121,10 +130,15 @@ jQuery.noConflict(true)($ => {
                             ], (iii, vvv) => {
                                 var contArr = [];
                                 $pp.contents().each((iiii, ppcc) => {
+                                    /* https://v2ex.com/t/610120?p=1#r_8039660 */
                                     if (Node.TEXT_NODE == ppcc.nodeType) {
-                                        contArr.push(ppcc.nodeValue.replace(vvv[0], vvv[1]));
+                                        if (0 == iii) {
+                                            contArr.push(ppcc.nodeValue.replace(vvv[0], vvv[1]));
+                                        } else {
+                                            contArr.push(filterXSS(ppcc.nodeValue.replace(vvv[0], vvv[1])));
+                                        }
                                     } else {
-                                        contArr.push(ppcc.outerHTML);
+                                        contArr.push(filterXSS(ppcc.outerHTML));
                                     }
                                 });
                                 $pp.html(contArr);
@@ -147,7 +161,7 @@ jQuery.noConflict(true)($ => {
                 }), function(e) {
                     return Number($(">span.small.fade", e).text().substr(2));
                 }, sortDesc));
-                $("<style>#Rightbar .reply_content { font-size: 12px; } #Rightbar td>div.fr { display: none; }</style>").appendTo(document.head);
+                $("<style>#Rightbar .reply_content { font-size: 12px; } #Rightbar>div>td>div.fr { display: none; }</style>").appendTo(document.head);
             }
         });
     }
