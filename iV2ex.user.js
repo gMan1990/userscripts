@@ -2,7 +2,7 @@
 // @name         iV2ex
 // @namespace    https://github.com/gMan1990/userscripts
 // @supportURL   https://github.com/gMan1990/userscripts/issues
-// @version      0.1.5
+// @version      0.1.6
 // @description  reply_content markdown, like clone sort, image viewer
 // @author       gIrl1990
 // @match        https://github.com/*/*/branches/all
@@ -12,7 +12,7 @@
 // @require      https://code.jquery.com/jquery-2.x-git.min.js
 // @require      https://unpkg.com/mapsort/compiled/iife/mapsort.min.js
 // @require      https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js
-// @require      https://raw.githubusercontent.com/leizongmin/js-xss/master/dist/xss.min.js
+// @require      https://cdn.jsdelivr.net/gh/leizongmin/js-xss/dist/xss.min.js
 // ==/UserScript==
 
 
@@ -25,6 +25,7 @@
  */
 
 
+// function/=>
 jQuery.noConflict(true)($ => {
     var sortDesc = (a, b) => a == b ? 0 : (a > b ? -1 : 1);
 
@@ -97,6 +98,9 @@ jQuery.noConflict(true)($ => {
                             return g1 + "\\" + g3;
                         });
 
+                        /* https://v2ex.com/t/610724?p=1#r_8049134 */
+                        /* to do */
+
                         /* replace before markdown */
                         var $cont = $(mconv.makeHtml(content));
                         /* replace after  markdown */
@@ -119,7 +123,8 @@ jQuery.noConflict(true)($ => {
 
                         $cont.filter("p").each((ii, pp) => {
                             var $pp = $(pp);
-                            $.each([
+                            // TODO
+                            [
                                 /* https://v2ex.com/t/607529?p=1 */
                                 [ /((^|\s)@)([^@\s]+)/g, function(m, g1, g2, g3) {
                                     return g1 + '<a href="/member/' + g3 + '">' + g3 + '</a>';
@@ -127,16 +132,16 @@ jQuery.noConflict(true)($ => {
                                     return g1 + '<a target="_blank" href="' + ("/" == g2[0] ? g2 : ("/" + g2)) + '" rel="nofollow">' + g2 + '</a>';
                                 } ]
                                 /* https://v2ex.com/t/608455?p=1#r_8015514 网址形式太复杂暂不处理 */
-                            ], (iii, vvv) => {
+                            ].forEach((vvv, iii, aaa) => {
                                 var contArr = [];
                                 $pp.contents().each((iiii, ppcc) => {
-                                    /* https://v2ex.com/t/610120?p=1#r_8039660 */
+                                    /* https://v2ex.com/t/610091?p=1#r_8101694 */
                                     if (Node.TEXT_NODE == ppcc.nodeType) {
+                                        var cont = filterXSS(ppcc.nodeValue.replace(vvv[0], vvv[1]));
                                         if (0 == iii) {
-                                            contArr.push(ppcc.nodeValue.replace(vvv[0], vvv[1]));
-                                        } else {
-                                            contArr.push(filterXSS(ppcc.nodeValue.replace(vvv[0], vvv[1])));
+                                            cont = cont.replace(/&/g, "&" + Array(aaa.length).fill("amp;").join(""));
                                         }
+                                        contArr.push(cont);
                                     } else {
                                         contArr.push(filterXSS(ppcc.outerHTML));
                                     }

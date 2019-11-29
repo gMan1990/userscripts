@@ -54,8 +54,22 @@
 
 # [Selectors](https://api.jquery.com/category/selectors/)
 
-## [jQuery Extensions](https://api.jquery.com/category/selectors/jquery-selector-extensions/)
+## [Attribute](https://api.jquery.com/category/selectors/attribute-selectors/)
 
-### ~~:first~~
+- [attribute]
+- [attribute=value]
 
-### ~~:last~~
+----
+- [attribute\~=value]
+- [attribute\*=value]
+
+----
+- [attribute|=value]
+- [attribute^=value]
+- [attribute$=value]
+
+## ~~[jQuery Extensions](https://api.jquery.com/category/selectors/jquery-selector-extensions/)~~
+
+- :first
+- :last
+- [attribute!=value]
