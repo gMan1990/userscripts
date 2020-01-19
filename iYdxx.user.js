@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         iYdxx
-// @version      0.1.0
-// @description  Min version, not pro version
+// @version      0.1.1
+// @description  Min version, not pro. For YunDingXX, text MUD
 // @match        http://joucks.cn:3344/
 // @match        http://yundingxx.com:3344/
 // @grant        unsafeWindow
-// @require      https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js
+// @require      https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js
 // @require      https://unpkg.com/element-ui@2.13.0/lib/index.js
 // @namespace    http://tampermonkey.net/
 
@@ -22,7 +22,6 @@
 
 
 jQuery(function($) {
-    document.getElementById("teamMinLevel").value = 45;
     document.body.onselectstart = null;
     document.body.style.overflowY = "overlay";
     $(document.head).append('<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">');
