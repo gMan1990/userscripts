@@ -6,11 +6,13 @@
 
 ### .text()
 
-### .each()
-
 ### .filter()
 
 ### .find()
+
+### .each()
+
+### .map()
 
 ## [Ajax](https://api.jquery.com/category/ajax/)
 
@@ -67,6 +69,8 @@
 #### .contents()
 
 #### .each()
+
+#### .map()
 
 # [Selectors](https://api.jquery.com/category/selectors/)
 

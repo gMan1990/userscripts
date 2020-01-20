@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         iYdxx
-// @version      0.1.1
+// @version      0.1.2
 // @description  Min version, not pro. For YunDingXX, text MUD
 // @match        http://joucks.cn:3344/
 // @match        http://yundingxx.com:3344/
@@ -90,7 +90,7 @@ jQuery(function($) {
             <el-col :span="2">耐力</el-col><el-col :span="2">+{{c.row.user_equipment.endurance_num}}</el-col>\
             <el-col :span="2">敏捷</el-col><el-col :span="2">+{{c.row.user_equipment.agile_num}}</el-col>\
         </template>';
-    $("#myTab").append('</li><li><a href="#goods2">^物品</a></li>')
+    $("#myTab").append('<li><a href="#goods2">^背包</a></li>')
         .next().append(`<div id="goods2" class="tab-pane">
                 <el-container v-loading="!userGoodsErr">
                     <el-header style="padding-top: 15px">
@@ -101,6 +101,8 @@ jQuery(function($) {
                             <el-input-number v-model="commGoodsNum" step-strictly size="mini" :min="1"></el-input-number>
                             <el-button :disabled="!commGoodsNum||2>$refs.t.store.states.selection.length" size="mini" type="text" @click="makeGoods">合成</el-button>
                             <el-button :disabled="!commGoodsNum||1!=$refs.t.store.states.selection.length" size="mini" type="text" @click="useGoodsToUser">使用</el-button>
+                            <br>
+                            <el-button :disabled="!commGoodsNum" size="mini" type="text" @click="byGoodsToMyUser('5dbfcc8cd9b8c0272471e2bf')">买红药水</el-button>
                         </span>
                     </el-header>
                     <el-main>
@@ -271,6 +273,7 @@ jQuery(function($) {
                     });
                 },
 
+                /** @param r row or event. */
                 useGoodsToUser : function(r) {
                     this.userGoodsErr = ""; /* lock */
                     r._id ? this._useGoodsToUser(r, 1) : this._useGoodsToUser(this.$refs.t.store.states.selection[0], this.commGoodsNum);
@@ -360,6 +363,40 @@ jQuery(function($) {
                         },
                         error : function(x, t, e) {
                             notify(`wearUserEquipment: ${e || t}`, "error", 9000);
+                            vm.userGoodsErr = " ";
+                        }
+                    });
+                },
+
+                byGoodsToMyUser : function(gid) {
+                    this.userGoodsErr = ""; /* lock */
+                    this._byGoodsToMyUser(gid, this.commGoodsNum);
+                },
+                _byGoodsToMyUser : function(gid, lastIndex) {
+                    let vm = this;
+                    $.ajax({
+                        data : {
+                            gid
+                        },
+                        type : "POST",
+                        url : "/api/byGoodsToMyUser",
+                        success : function(d, t, x) {
+                            if (200 == d.code) {
+                                $log.prepend(`<p class="loginfo">购得 [<span style="${d.data.style}">${d.data.name}</span>] x1 单价=${d.data.price}${vm.price_type[d.data.price_type]}</p>`);
+                                notify(JSON.stringify(d), "success");
+                                if (1 < lastIndex) {
+                                    setTimeout(function() {
+                                        vm._byGoodsToMyUser(gid, --lastIndex);
+                                    }, 400);
+                                } else {
+                                    vm.userGoodsErr = " ";
+                                }
+                            } else {
+                                this.error(x, d.msg);
+                            }
+                        },
+                        error : function(x, t, e) {
+                            notify(`byGoodsToMyUser: ${e || t}`, "error", 9000);
                             vm.userGoodsErr = " ";
                         }
                     });
