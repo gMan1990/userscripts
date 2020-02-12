@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         iYdxx
-// @version      0.1.2
+// @version      0.1.3
 // @description  Min version, not pro. For YunDingXX, text MUD
 // @match        http://joucks.cn:3344/
 // @match        http://yundingxx.com:3344/
@@ -22,6 +22,7 @@
 
 
 jQuery(function($) {
+    document.getElementById("user-task").previousElementSibling.onclick = getUserTaskFunc;
     document.body.onselectstart = null;
     document.body.style.overflowY = "overlay";
     $(document.head).append('<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">');
@@ -102,6 +103,8 @@ jQuery(function($) {
                             <el-button :disabled="!commGoodsNum||2>$refs.t.store.states.selection.length" size="mini" type="text" @click="makeGoods">合成</el-button>
                             <el-button :disabled="!commGoodsNum||1!=$refs.t.store.states.selection.length" size="mini" type="text" @click="useGoodsToUser">使用</el-button>
                             <br>
+                            <el-button :disabled="!commGoodsNum" size="mini" type="text" @click="byGoodsToMyUser('5df6ee69f6ffda1f2ccc4739')">买500活</el-button>
+                            <el-button :disabled="!commGoodsNum" size="mini" type="text" @click="byGoodsToMyUser('5dbd161e928be213f1c3accc')">买宝宝窝</el-button>
                             <el-button :disabled="!commGoodsNum" size="mini" type="text" @click="byGoodsToMyUser('5dbfcc8cd9b8c0272471e2bf')">买红药水</el-button>
                         </span>
                     </el-header>
@@ -115,7 +118,7 @@ jQuery(function($) {
                                 </template>
                             </el-table-column>
                             <el-table-column width="180">
-                                <template slot-scope="h" slot="header"><el-input v-model="userGoodsSearch" clearable size="mini" placeholder="搜索" @input="userGoodsSearchInput"></el-input></template>
+                                <template slot-scope="h" slot="header"><el-input v-model="userGoodsSearch" clearable size="mini" placeholder="正则搜索" @input="userGoodsSearchInput"></el-input></template>
                                 <template slot-scope="c">
                                     <el-popover :content="c.row.goods.info"><span slot="reference" :style="c.row.goods.style">{{c.row.goods.name}}</span></el-popover>
                                     <span v-if="c.row.user_equipment" style="float: right">{{c.row.user_equipment.wear_level}}{{eq_type[c.row.user_equipment.type]}}</span>
@@ -154,7 +157,7 @@ jQuery(function($) {
             "1" : "武",
             "2" : "甲",
             "3" : "头",
-            "4" : "饰",
+            "4" : "饰", /* 链 */
             "5" : "腰",
             "6" : "靴"
         };
@@ -176,7 +179,9 @@ jQuery(function($) {
             },
             methods : {
                 userGoodsSearchInput : function(s) {
-                    this._userGoodsList && (this.userGoodsList = s ? this._userGoodsList.filter(d => d.goods.name.includes(s)) : this._userGoodsList);
+                    this._userGoodsList && (this.userGoodsList = s ? this._userGoodsList.filter(function(d) {
+                        return this.test(d.goods.name);
+                    }, new RegExp(s)) : this._userGoodsList);
                 },
                 userGoodsTypeFmt : function(row) {
                     if (row.user_equipment) {
@@ -293,9 +298,7 @@ jQuery(function($) {
                                 $log.prepend(`<p class="loginfo" style="color: coral;word-break: break-all">使用 [<span style="${r.goods.style}">${r.goods.name}</span>] ${JSON.stringify(d.data)}</p>`);
                                 notify(JSON.stringify(d), "success", 4500, true);
                                 if (1 < lastIndex) {
-                                    setTimeout(function() {
-                                        vm._useGoodsToUser(r, --lastIndex);
-                                    }, 400);
+                                    setTimeout(vm._useGoodsToUser, 350, r, --lastIndex);
                                 } else {
                                     vm.userGoodsErr = " ";
                                 }
@@ -327,7 +330,7 @@ jQuery(function($) {
                             if (200 == d.code) {
                                 for (let v of vm.$refs.t.store.states.selection) {
                                     v.count -= vm.commGoodsNum; }
-                                $log.prepend(`<p class="loginfo">合成 [<span style="${d.data.goods.style}">${d.data.goods.name}</span>] x${d.data.count}</p>`);
+                                $log.prepend(`<p class="loginfo">合成 [<span style="${d.data.goods.style}">${d.data.goods.name}</span>] *${d.data.count}</p>`);
                                 notify(JSON.stringify(d), "success");
                                 vm.userGoodsErr = " ";
                             } else {
@@ -382,12 +385,10 @@ jQuery(function($) {
                         url : "/api/byGoodsToMyUser",
                         success : function(d, t, x) {
                             if (200 == d.code) {
-                                $log.prepend(`<p class="loginfo">购得 [<span style="${d.data.style}">${d.data.name}</span>] x1 单价=${d.data.price}${vm.price_type[d.data.price_type]}</p>`);
+                                $log.prepend(`<p class="loginfo">购得 [<span style="${d.data.style}">${d.data.name}</span>] *1 单价=${d.data.price}${vm.price_type[d.data.price_type]}</p>`);
                                 notify(JSON.stringify(d), "success");
                                 if (1 < lastIndex) {
-                                    setTimeout(function() {
-                                        vm._byGoodsToMyUser(gid, --lastIndex);
-                                    }, 400);
+                                    setTimeout(vm._byGoodsToMyUser, 350, gid, --lastIndex);
                                 } else {
                                     vm.userGoodsErr = " ";
                                 }
