@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         iYdxx
-// @version      0.1.3
+// @version      0.1.4
 // @description  Min version, not pro. For YunDingXX, text MUD
 // @match        http://joucks.cn:3344/
 // @match        http://yundingxx.com:3344/
@@ -253,7 +253,9 @@ jQuery(function($) {
                             if (200 == d.code) {
                                 for (let v of d.data) {
                                     if (!v.goods) {
-                                        if (v.user_equipment.status) {
+                                        if (!v.user_equipment) {
+                                            v.user_equipment = {};
+                                        } else if (v.user_equipment.status) {
                                             continue;
                                         }
                                         v.goods = v.user_equipment;
